@@ -39,38 +39,6 @@ class VoiceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function check(Request $request)
-    {
-        // checking question
-        $question = Question::where('id', $request->question_id)->where('user_id', '!=', Auth::id())->first();
-        
-        if ($question) {
-            $question_user = Question::where('id', $request->question_id)->whereHas('voice', function ($query_voice) {
-                $query_voice->where('user_id', Auth::id());
-            })->first();
-            if ($question_user) {
-                if ($question_user->voice->first()->value == $request->value) {
-                    return response()->json([
-                        'status' => 500,
-                        'message' => 'The user is not allowed to vote more than once'
-                    ]);
-                } else {
-                    return $this->update($request->value, $question);
-                }
-            }
-            
-            return $this->store($request->question_id, $request->value);
-        } else {
-            return response()->json([
-                'status' => 500,
-                'message' => 'The user is not allowed to vote to your question'
-            ]);
-        }
-
-    }
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(VoiceRequest $request)
     {
         try {
